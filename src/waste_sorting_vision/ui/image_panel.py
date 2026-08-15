@@ -27,7 +27,7 @@ def _render_class_counts(class_counts: Mapping[str, int]) -> None:
 
     st.dataframe(
         _counts_to_rows(class_counts),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -47,7 +47,7 @@ def _render_detection_rows(result: ImageInferenceResult) -> None:
                 }
                 for row in result.detection_rows
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -105,7 +105,7 @@ def render_image_panel(
     run_inference = st.button(
         "Run image inference",
         type="primary",
-        use_container_width=True,
+        width="stretch",
         disabled=preview_image is None,
         key="run_image_inference",
     )
@@ -131,14 +131,14 @@ def render_image_panel(
         if preview_image is None:
             st.info("Upload an image or keep a demo image under `assets/demo_images/`.")
         else:
-            st.image(preview_image, caption=preview_label, use_container_width=True)
+            st.image(preview_image, caption=preview_label, width="stretch")
 
     with col2:
         if inference_result is not None:
             st.image(
                 inference_result.annotated_image,
                 caption="Detected image",
-                use_container_width=True,
+                width="stretch",
             )
             if enable_download:
                 st.download_button(
@@ -146,7 +146,7 @@ def render_image_panel(
                     data=image_to_png_bytes(inference_result.annotated_image),
                     file_name="waste-sorting-vision_prediction.png",
                     mime="image/png",
-                    use_container_width=True,
+                    width="stretch",
                 )
         else:
             reference_detected_image = _load_reference_detected_image()
@@ -154,7 +154,7 @@ def render_image_panel(
                 st.image(
                     reference_detected_image,
                     caption="Demo detected example",
-                    use_container_width=True,
+                    width="stretch",
                 )
             else:
                 st.info("Run inference to view the annotated result.")

@@ -17,7 +17,7 @@ _DATACLASS_KWARGS = {"slots": True} if sys.version_info >= (3, 10) else {}
 
 @dataclass(**_DATACLASS_KWARGS)
 class ImageInferenceResult:
-    annotated_image: Image.Image
+    annotated_image: Image.Image | np.ndarray
     class_counts: dict[str, int]
     detection_rows: list[dict[str, Any]]
 
@@ -86,6 +86,25 @@ def build_detection_rows(
     return rows
 
 
+def _build_image_inference_result(
+    result: Any,
+    class_names: Mapping[int, str],
+    *,
+    as_pil: bool = True,
+) -> ImageInferenceResult:
+    detection_rows = build_detection_rows(result, class_names)
+    label_ids = [row["class_id"] for row in detection_rows]
+    annotated_rgb = result.plot()[:, :, ::-1]
+    annotated_image: Image.Image | np.ndarray = (
+        Image.fromarray(annotated_rgb) if as_pil else annotated_rgb
+    )
+    return ImageInferenceResult(
+        annotated_image=annotated_image,  # type: ignore[arg-type]
+        class_counts=summarize_class_counts(label_ids, class_names),
+        detection_rows=detection_rows,
+    )
+
+
 def predict_image(
     detector: Any,
     image: Image.Image | np.ndarray,
@@ -94,14 +113,41 @@ def predict_image(
 ) -> ImageInferenceResult:
     image_array = _to_rgb_array(image)
     result = detector.predict(image_array, conf=confidence, verbose=False)[0]
-    detection_rows = build_detection_rows(result, class_names)
-    label_ids = [row["class_id"] for row in detection_rows]
-    annotated_rgb = result.plot()[:, :, ::-1]
-    return ImageInferenceResult(
-        annotated_image=Image.fromarray(annotated_rgb),
-        class_counts=summarize_class_counts(label_ids, class_names),
-        detection_rows=detection_rows,
-    )
+    return _build_image_inference_result(result, class_names)
+
+
+def resize_frame_for_inference(
+    frame_bgr: np.ndarray,
+    max_width: int,
+) -> np.ndarray:
+    if max_width <= 0:
+        return frame_bgr
+
+    height, width = frame_bgr.shape[:2]
+    if width <= max_width:
+        return frame_bgr
+
+    scale = max_width / width
+    new_size = (max_width, max(1, int(height * scale)))
+    return cv2.resize(frame_bgr, new_size, interpolation=cv2.INTER_AREA)
+
+
+def predict_frame(
+    detector: Any,
+    frame_bgr: np.ndarray,
+    confidence: float,
+    class_names: Mapping[int, str],
+    *,
+    imgsz: int = 640,
+    as_pil: bool = True,
+) -> ImageInferenceResult:
+    result = detector.predict(
+        frame_bgr,
+        conf=confidence,
+        verbose=False,
+        imgsz=imgsz,
+    )[0]
+    return _build_image_inference_result(result, class_names, as_pil=as_pil)
 
 
 def run_video_inference(

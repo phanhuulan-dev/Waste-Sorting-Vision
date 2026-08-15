@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import sys
+from typing import Any, Callable
 
 import streamlit as st
 
@@ -19,6 +20,7 @@ from waste_sorting_vision.detector import (
     resolve_model_path,
 )
 from waste_sorting_vision.ui.image_panel import render_image_panel
+from waste_sorting_vision.ui.stream_panel import render_stream_panel
 from waste_sorting_vision.ui.video_panel import render_video_panel
 
 
@@ -31,12 +33,38 @@ def _resolve_default_model_index(model_options: dict[str, str], default_model_ke
     return 0
 
 
+def _render_input_panels(
+    render_fns: list[tuple[str, Callable[[], None]]],
+) -> None:
+    if not render_fns:
+        st.warning("No input modes are enabled in `configs/app.yaml`.")
+        return
+
+    if len(render_fns) == 1:
+        render_fns[0][1]()
+        return
+
+    # Render only the selected mode. `st.tabs` runs every panel on each rerun,
+    # which breaks live webcam streaming (OpenCV + YOLO on the same loop).
+    labels = [label for label, _ in render_fns]
+    render_by_label = {label: render_fn for label, render_fn in render_fns}
+    selected = st.radio(
+        "Input mode",
+        options=labels,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="input_mode_selector",
+    )
+    render_by_label[selected]()
+
+
 def main() -> None:
     app_config = load_app_config()
     defaults = app_config["defaults"]
     ui = app_config["ui"]
     features = app_config["features"]
     video_config = app_config.get("video", {})
+    stream_config = app_config.get("stream", {})
 
     st.set_page_config(
         page_title=ui["app_title"],
@@ -45,7 +73,7 @@ def main() -> None:
     )
     st.title(ui["app_title"])
     st.caption(
-        "Image and video waste detection app with configurable checkpoints and supporting project notes."
+        "Image, video, and live webcam waste detection with configurable checkpoints."
     )
 
     model_options = list_model_options()
@@ -90,41 +118,61 @@ def main() -> None:
 
     st.sidebar.caption(f"Resolved checkpoint: `{model_path}`")
 
-    if features.get("enable_image_inference") and features.get("enable_video_inference"):
-        image_tab, video_tab = st.tabs(["Image", "Video"])
-        with image_tab:
-            render_image_panel(
-                detector=detector,
-                class_names=class_names,
-                confidence=confidence,
-                enable_download=features.get("enable_download_annotated_image", True),
-            )
-        with video_tab:
-            render_video_panel(
-                detector=detector,
-                class_names=class_names,
-                confidence=confidence,
-                frame_stride=int(video_config.get("frame_stride", 12)),
-                max_frames=video_config.get("max_frames"),
-            )
-        return
+    render_fns: list[tuple[str, Callable[[], None]]] = []
 
     if features.get("enable_image_inference"):
-        render_image_panel(
-            detector=detector,
-            class_names=class_names,
-            confidence=confidence,
-            enable_download=features.get("enable_download_annotated_image", True),
+        render_fns.append(
+            (
+                "Image",
+                lambda: render_image_panel(
+                    detector=detector,
+                    class_names=class_names,
+                    confidence=confidence,
+                    enable_download=features.get("enable_download_annotated_image", True),
+                ),
+            )
         )
 
     if features.get("enable_video_inference"):
-        render_video_panel(
-            detector=detector,
-            class_names=class_names,
-            confidence=confidence,
-            frame_stride=int(video_config.get("frame_stride", 12)),
-            max_frames=video_config.get("max_frames"),
+        render_fns.append(
+            (
+                "Video",
+                lambda: render_video_panel(
+                    detector=detector,
+                    class_names=class_names,
+                    confidence=confidence,
+                    frame_stride=int(video_config.get("frame_stride", 12)),
+                    max_frames=video_config.get("max_frames"),
+                ),
+            )
         )
+
+    if features.get("enable_live_stream"):
+        render_fns.append(
+            (
+                "Live",
+                lambda: render_stream_panel(
+                    detector=detector,
+                    class_names=class_names,
+                    confidence=confidence,
+                    default_source_mode=str(
+                        stream_config.get("default_source_mode", "browser")
+                    ),
+                    camera_index=int(stream_config.get("camera_index", 0)),
+                    target_fps=float(stream_config.get("target_fps", 15)),
+                    inference_stride=int(stream_config.get("inference_stride", 2)),
+                    inference_imgsz=int(stream_config.get("inference_imgsz", 416)),
+                    max_frame_width=int(stream_config.get("max_frame_width", 640)),
+                    camera_buffer_size=int(stream_config.get("camera_buffer_size", 1)),
+                    stats_update_stride=int(stream_config.get("stats_update_stride", 5)),
+                    show_detection_details=bool(
+                        stream_config.get("show_detection_details", True)
+                    ),
+                ),
+            )
+        )
+
+    _render_input_panels(render_fns=render_fns)
 
 
 if __name__ == "__main__":

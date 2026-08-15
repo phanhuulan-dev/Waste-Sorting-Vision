@@ -28,7 +28,7 @@ def _render_class_counts(class_counts: Mapping[str, int]) -> None:
 
     st.dataframe(
         _counts_to_rows(class_counts),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -114,7 +114,7 @@ def render_video_panel(
     run_inference = st.button(
         "Run video inference",
         type="primary",
-        use_container_width=True,
+        width="stretch",
         disabled=(selected_path is None and uploaded_video is None),
         key="run_video_inference",
     )
@@ -147,7 +147,7 @@ def render_video_panel(
                     frame_placeholder.image(
                         annotated_frame,
                         caption="Live annotated frame",
-                        use_container_width=True,
+                        width="stretch",
                     )
 
                 try:
@@ -179,6 +179,6 @@ def render_video_panel(
             st.image(
                 inference_result.last_annotated_frame,
                 caption="Last annotated sampled frame",
-                use_container_width=True,
+                width="stretch",
             )
         _render_class_counts(inference_result.class_counts)
