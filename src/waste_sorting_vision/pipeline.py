@@ -14,6 +14,10 @@ from .class_names import get_class_name
 
 _DATACLASS_KWARGS = {"slots": True} if sys.version_info >= (3, 10) else {}
 
+# Each object has a single material, so suppress overlapping boxes across classes
+# too; otherwise one bottle can be drawn as both "PET" and "Glass".
+_PREDICT_KWARGS = {"agnostic_nms": True, "verbose": False}
+
 
 @dataclass(**_DATACLASS_KWARGS)
 class ImageInferenceResult:
@@ -30,9 +34,10 @@ class VideoInferenceResult:
     last_annotated_frame: Image.Image | None
 
 
-def _to_rgb_array(image: Image.Image | np.ndarray) -> np.ndarray:
+def _to_bgr_array(image: Image.Image | np.ndarray) -> np.ndarray:
+    """Ultralytics treats numpy input as BGR (OpenCV order), so PIL images must be flipped."""
     if isinstance(image, Image.Image):
-        return np.asarray(image.convert("RGB"))
+        return np.ascontiguousarray(np.asarray(image.convert("RGB"))[:, :, ::-1])
     return image
 
 
@@ -111,8 +116,8 @@ def predict_image(
     confidence: float,
     class_names: Mapping[int, str],
 ) -> ImageInferenceResult:
-    image_array = _to_rgb_array(image)
-    result = detector.predict(image_array, conf=confidence, verbose=False)[0]
+    image_array = _to_bgr_array(image)
+    result = detector.predict(image_array, conf=confidence, **_PREDICT_KWARGS)[0]
     return _build_image_inference_result(result, class_names)
 
 
@@ -144,8 +149,8 @@ def predict_frame(
     result = detector.predict(
         frame_bgr,
         conf=confidence,
-        verbose=False,
         imgsz=imgsz,
+        **_PREDICT_KWARGS,
     )[0]
     return _build_image_inference_result(result, class_names, as_pil=as_pil)
 
@@ -183,7 +188,7 @@ def run_video_inference(
                 continue
 
             sampled_frames += 1
-            result = detector.predict(frame, conf=confidence, verbose=False)[0]
+            result = detector.predict(frame, conf=confidence, **_PREDICT_KWARGS)[0]
             collected_label_ids.extend(extract_label_ids(result))
             annotated_rgb = result.plot()[:, :, ::-1]
             last_annotated_frame = Image.fromarray(annotated_rgb)
