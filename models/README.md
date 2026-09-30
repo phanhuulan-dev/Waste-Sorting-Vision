@@ -4,9 +4,15 @@ Do not hard-code checkpoint paths in application source files.
 
 Current repository setup:
 
+- `waste_v5` (default) resolves to `models/waste_v5.pt`
+- `waste_v3` resolves to `models/waste_v3.pt`
+- `waste_v2` resolves to `models/waste_v2.pt`
 - `best` resolves to `models/best.pt`
 - `best5` resolves to `models/best5.pt`
 - environment overrides:
+  - `WSV_MODEL_WASTE_V5`
+  - `WSV_MODEL_WASTE_V3`
+  - `WSV_MODEL_WASTE_V2`
   - `WSV_MODEL_BEST`
   - `WSV_MODEL_BEST5`
 

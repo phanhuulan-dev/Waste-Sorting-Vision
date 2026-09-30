@@ -1,4 +1,4 @@
-default_model_key: best5
+default_model_key: waste_v5
 
 model_class_names:
   best:
@@ -34,3 +34,15 @@ model_class_names:
     13: PET
     14: Styrofoam
     15: Battery
+  waste_v5: &waste_9_classes
+    0: Paper
+    1: Paper Cup
+    2: Vinyl
+    3: Plastic
+    4: Glass
+    5: Can
+    6: PET
+    7: Styrofoam
+    8: Battery
+  waste_v3: *waste_9_classes
+  waste_v2: *waste_9_classes

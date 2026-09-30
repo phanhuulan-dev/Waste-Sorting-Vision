@@ -16,7 +16,7 @@ def test_app_config_loads() -> None:
 def test_model_sources_loads() -> None:
     data = load_model_sources()
     assert "models" in data
-    assert set(data["models"]) == {"best", "best5"}
+    assert set(data["models"]) == {"best", "best5", "waste_v2", "waste_v3", "waste_v5"}
 
 
 def test_default_demo_assets_resolve() -> None:

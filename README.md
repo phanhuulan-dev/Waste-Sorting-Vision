@@ -36,8 +36,11 @@ Sample detection output from the current application:
 
 - the recorded training history covers `8`, `11`, `15`, and `16`-class settings
 - the highest `mAP@50` listed in the summary table is `0.957` from a `yolov8s`, `640`, `38,000` image, `8`-class experiment
-- the default app checkpoint is `best5.pt`, which uses a `16`-class label set
-- the alternate `best.pt` checkpoint uses a `15`-class label set embedded in the model
+- the default app checkpoint is `waste_v5.pt`, a `yolov8m` model with a `9`-class label set (Paper, Paper Cup, Vinyl, Plastic, Glass, Can, PET, Styrofoam, Battery) trained on TACO (official and community annotations) plus Roboflow Universe datasets, after a label-quality audit that removed mislabelled sources and images with missing labels
+- on the `waste_v5` validation set (3,484 images) it reaches `mAP@50` `0.768` / `mAP@50-95` `0.644`, versus `0.699` for `waste_v3.pt` and `0.677` for `waste_v2.pt` (both `yolov8n`)
+- on real-world TACO photos it reaches `0.381` on the official validation split (`waste_v2.pt`: `0.362`) and `0.268` on official plus community validation photos (`waste_v2.pt`: `0.210`); Glass and Styrofoam remain weak on such photos, so real-world results should be treated as experimental
+- `waste_v5.pt` is about 4x slower than the `yolov8n` checkpoints on CPU; `waste_v3.pt` and `waste_v2.pt` stay selectable for faster video and webcam use
+- the older `best5.pt` (`16` classes) and `best.pt` (`15` classes) checkpoints remain selectable for comparison
 
 Representative project figure:
 
@@ -99,8 +102,11 @@ pytest -p no:cacheprovider tests
 
 ## Checkpoint Configuration
 
-The app exposes two model keys right now:
+The app exposes these model keys:
 
+- `waste_v5` (default)
+- `waste_v3`
+- `waste_v2`
 - `best`
 - `best5`
 
@@ -111,6 +117,9 @@ Resolution order is:
 
 Environment variables:
 
+- `WSV_MODEL_WASTE_V5`
+- `WSV_MODEL_WASTE_V3`
+- `WSV_MODEL_WASTE_V2`
 - `WSV_MODEL_BEST`
 - `WSV_MODEL_BEST5`
 
@@ -121,6 +130,7 @@ If you later decide to move the checkpoints outside the repository, point those 
 - [Project scope note](docs/reproducibility_note.md)
 - [Environment reference](docs/environment_reference.md)
 - [Class labels](docs/class_taxonomy_reconstruction.md)
+- [Results report for the 9-class models (Vietnamese)](docs/bao_cao_ket_qua.md)
 - [Modelling report](docs/modeling_report.md)
 - [Experiment history](docs/experiment_history.md)
 - [Preprocessing summary](docs/preprocessing_summary.md)

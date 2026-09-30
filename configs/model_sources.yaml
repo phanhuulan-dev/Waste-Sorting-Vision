@@ -1,13 +1,31 @@
 models:
+  waste_v5:
+    display_name: waste_v5.pt (9 classes, YOLOv8m)
+    artifact_path: ./models/waste_v5.pt
+    env_var: WSV_MODEL_WASTE_V5
+    storage: local_or_external
+    notes: default app model; YOLOv8m on the audited waste_v5 data (v5 val mAP50 0.768, TACO official val 0.381, TACO official+unofficial val 0.268)
+  waste_v3:
+    display_name: waste_v3.pt (9 classes)
+    artifact_path: ./models/waste_v3.pt
+    env_var: WSV_MODEL_WASTE_V3
+    storage: local_or_external
+    notes: YOLOv8n; waste_v2 data plus real-world litter scenes (v5 val mAP50 0.699, TACO official val 0.283)
+  waste_v2:
+    display_name: waste_v2.pt (9 classes)
+    artifact_path: ./models/waste_v2.pt
+    env_var: WSV_MODEL_WASTE_V2
+    storage: local_or_external
+    notes: previous 9-class yolov8n (v3 val mAP50 0.673, new real-world val 0.154, TACO val 0.362)
+  best5:
+    display_name: best5.pt (16 classes)
+    artifact_path: ./models/best5.pt
+    env_var: WSV_MODEL_BEST5
+    storage: local_or_external
+    notes: 16-class checkpoint from the original training history
   best:
     display_name: best.pt (15 classes)
     artifact_path: ./models/best.pt
     env_var: WSV_MODEL_BEST
     storage: local_or_external
     notes: 15-class checkpoint with embedded checkpoint labels
-  best5:
-    display_name: best5.pt (16 classes)
-    artifact_path: ./models/best5.pt
-    env_var: WSV_MODEL_BEST5
-    storage: local_or_external
-    notes: 16-class checkpoint used as the default app model

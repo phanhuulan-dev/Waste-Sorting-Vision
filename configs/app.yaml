@@ -1,7 +1,7 @@
 defaults:
   input_mode: image
   confidence: 0.40
-  model_key: best5
+  model_key: waste_v5
 
 ui:
   app_title: "Waste Sorting Vision"
