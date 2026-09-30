@@ -139,11 +139,24 @@ If you later decide to move the checkpoints outside the repository, point those 
 ## References
 
 - AI-Hub Household Waste Dataset: https://aihub.or.kr/aihubdata/data/view.do?dataSetSn=71385
+- TACO (Trash Annotations in Context): https://github.com/pedropro/TACO
+- Roboflow Universe datasets used for training: listed with licences in [docs/bao_cao_ket_qua.md](docs/bao_cao_ket_qua.md)
 - Ultralytics YOLO: https://github.com/ultralytics/ultralytics
 - Streamlit: https://streamlit.io/
 
 ## Attribution
 
-This repository presents the project as a standalone public release.
-My original work on the project centred on detection model training, inference, and the end-to-end application workflow.
-For this release, I also reorganised the repository, modularised the codebase, and prepared the documentation and configuration for a cleaner public-facing version.
+This project builds on [Waste Sorting Vision](https://github.com/J-Y00N/Waste-Sorting-Vision) by J. Yoon, released under the MIT License, which is kept unchanged in [LICENSE](LICENSE).
+
+From the original project:
+
+- the Streamlit application and its modular code structure
+- the `best.pt` (15-class) and `best5.pt` (16-class) checkpoints trained on AI-Hub data, with their experiment history and documentation
+
+Added in this fork:
+
+- a 9-class label set suited to publicly available data, and the `waste_v2`, `waste_v3` and `waste_v5` YOLOv8 checkpoints (`waste_v5` is the default)
+- a data pipeline that merges TACO (official and community annotations) with Roboflow Universe datasets, removes near-duplicate images and fixes EXIF-rotated images
+- a model-assisted label audit that excluded mislabelled sources and images with missing labels
+- a Colab training notebook, evaluation scripts, and a results report with error analysis and limitations
+- fixes to the app's image inference (colour channel order and duplicate labels across classes)
