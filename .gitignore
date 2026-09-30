@@ -216,3 +216,11 @@ __marimo__/
 outputs/
 artifacts/
 .DS_Store
+
+# Waste Sorting Vision: local data, training artefacts and packaged datasets
+datasets/
+runs/
+audit/
+*.zip
+/yolov8*.pt
+/yolo11*.pt
