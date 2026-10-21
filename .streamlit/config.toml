@@ -1,0 +1,11 @@
+[server]
+maxUploadSize = 512
+headless = true
+fileWatcherType = "none"
+runOnSave = false
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"

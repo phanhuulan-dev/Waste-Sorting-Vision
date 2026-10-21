@@ -1,0 +1,40 @@
+defaults:
+  input_mode: image
+  confidence: 0.40
+  model_key: waste_v5
+
+ui:
+  app_title: "Waste Sorting Vision"
+  show_demo_assets: true
+  language: en
+
+features:
+  enable_image_inference: true
+  enable_video_inference: true
+  enable_live_stream: true
+  enable_tracking: true
+  enable_download_annotated_image: true
+
+assets:
+  default_image: ./assets/demo_images/default_input.png
+  default_detected_image: ./assets/demo_images/default_detected.jpg
+  demo_videos:
+    Validation: ./assets/demo_videos/validation.mp4
+    Test1: ./assets/demo_videos/density_slow.mp4
+    Test2: ./assets/demo_videos/test_clip.mp4
+    Test3: ./assets/demo_videos/ai_vision_robot.mp4
+
+video:
+  frame_stride: 12
+  max_frames: null
+
+stream:
+  default_source_mode: webrtc
+  camera_index: 0
+  target_fps: 15
+  inference_stride: 1
+  inference_imgsz: 416
+  max_frame_width: 640
+  camera_buffer_size: 1
+  stats_update_stride: 5
+  show_detection_details: true

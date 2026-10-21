@@ -1,0 +1,15 @@
+default_model_key: waste_v5
+
+model_class_names:
+  waste_v5: &waste_9_classes
+    0: Paper
+    1: Paper Cup
+    2: Vinyl
+    3: Plastic
+    4: Glass
+    5: Can
+    6: PET
+    7: Styrofoam
+    8: Battery
+  waste_v3: *waste_9_classes
+  waste_v2: *waste_9_classes

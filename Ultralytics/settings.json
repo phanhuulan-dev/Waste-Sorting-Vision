@@ -1,0 +1,21 @@
+{
+  "settings_version": "0.0.6",
+  "datasets_dir": "/Users/mac/Documents/Waste-Sorting-Vision/datasets",
+  "weights_dir": "/Users/mac/Documents/Waste-Sorting-Vision/weights",
+  "runs_dir": "/Users/mac/Documents/Waste-Sorting-Vision/runs",
+  "uuid": "3f59c068e66f2008ea42cb14f23d10bb5cd8f480b7de6b91c6f3c1519b3f8afc",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "hub": true,
+  "mlflow": true,
+  "neptune": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}

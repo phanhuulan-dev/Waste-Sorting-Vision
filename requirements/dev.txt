@@ -1,0 +1,5 @@
+-r app.txt
+pytest==9.0.3
+ruff==0.15.10
+black==26.3.1
+mypy==1.20.1
